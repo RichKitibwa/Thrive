@@ -1,0 +1,12 @@
+.container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.card {
+    padding: 20px;
+}
+.progress {
+    margin-bottom: 15px;
+}
