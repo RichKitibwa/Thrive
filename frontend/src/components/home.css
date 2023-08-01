@@ -1,0 +1,32 @@
+.home-container {
+    background-color: #f4f6f6;
+}
+.navbar-brand {
+    padding-left: 2rem;
+    font-size: 24px;
+    font-weight: bold;
+    color: black;
+}
+.nav-link-container {
+    padding-right: 2rem;
+}
+.navbar-nav a {
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+}
+.container-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.lead-text {
+    font-weight: 600;
+    font-size: 50px;
+    font-family: Arial, Helvetica, Georgia;
+}
+.image-container img {
+    width: 100%;
+    height: auto;
+}
