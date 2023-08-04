@@ -3,6 +3,9 @@ import { Form, Button, Alert } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import zxcvbn from "zxcvbn";
 import { GoogleLogin } from '@react-oauth/google';
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 function SignupForm() {
 
@@ -31,23 +34,31 @@ function SignupForm() {
         }
     };
 
-    const onSubmit = async (data) => {
-    setServerError("");
-        try {
-        const response = await fetch("/api/auth", {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        });
+    const navigate = useNavigate();
 
+    const onSubmit = async (formData) => {
+        const { username, email, password } = formData;
+        setServerError("");
+        try {
+        const response = await axios.post("/api/auth/register", {
+            username,
+            email,
+            password,
+        });
+        
         if (response.status !== 200) {
-            throw new Error(await response.text());
+            throw new Error(response.data.message || "Failed to Sign up");
         }
 
-        alert("You have signed up successfully!");
+        const token = response.data.token;
+
+        localStorage.setItem("token", token);
+
+        console.log(response.data);
+
         reset();
+
+        navigate("/dashboard")
         } catch (error) {
         setServerError(error.message);
         }
@@ -59,13 +70,31 @@ function SignupForm() {
         setPasswordStrength(score);
     };
 
-    const onGoogleSuccess = (response) => {
-        const profile = response.profileObj;
-        setGoogleUser(profile);
-        alert(`Welcome ${profile.name}!`);
+    const onGoogleSuccess = async (response) => {
+        console.log(response);
+        const idToken = response.credential;
+        console.log('ID Token:', idToken);
+        try {
+            const backendResponse = await axios.post("/api/auth/google-signup", {
+                googleToken: idToken,
+            });
+
+            if(backendResponse.status !== 200) {
+                throw new Error(backendResponse.data.message || "Failed to signup with Google.");
+            }
+
+            const token = backendResponse.data.token;
+            localStorage.setItem("token", token);
+
+            console.log(backendResponse.data);
+            navigate("/dashboard");
+        } catch (error){
+            setServerError(error.message);
+        }
     };
 
     const onGoogleFailure = (response) => {
+        console.log(response.error);
         alert(`Google sign-in failed: ${response.error}`);
     };
 
@@ -203,21 +232,20 @@ function SignupForm() {
                                 <Button variant="primary" type="submit" block className="mb-3">
                                     Sign Up
                                 </Button>
-
-                                {/* The sign in with Google button */}
-                                <div className="text-center">
-                                    <GoogleLogin
-                                        clientId="195441218187-i7r5ouroutjtbf6js7ks8sirjans9qfr.apps.googleusercontent.com"
-                                        buttonText="Sign in with Google"
-                                        onSuccess={onGoogleSuccess}
-                                        onFailure={onGoogleFailure}
-                                        cookiePolicy={"single_host_origin"}
-                                        className="mt-3"
-                                    />
-                                </div>
                             </Form>
                         </div>  
-                    </div>      
+                    </div>   
+                    {/* The sign in with Google button */}
+                    <div className="text-center">
+                        <GoogleLogin
+                            clientId="195441218187-i7r5ouroutjtbf6js7ks8sirjans9qfr.apps.googleusercontent.com"
+                            onSuccess={onGoogleSuccess}
+                            onFailure={onGoogleFailure}
+                            shape="pill"
+                            cookiePolicy={"single_host_origin"}
+                            className="mt-3"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
