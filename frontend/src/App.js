@@ -5,6 +5,7 @@ import './App.css';
 import SignupForm from './components/SignupForm';
 import LoginForm from './components/LoginForm';
 import Home from './components/home';
+import TaskDashboard from './components/TaskDashboard';
 import "bootstrap/dist/css/bootstrap.min.css"
 
 
@@ -15,6 +16,7 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path="/signup" element={<SignupForm />} />
         <Route path="/login" element={<LoginForm />} />
+        <Route path="/dashboard" element={<TaskDashboard />} />
       </Routes>
     </Router>
   

@@ -3,6 +3,11 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const authenticateUser = require('../middlewares/authMiddleware');
+const { OAuth2Client } = require('google-auth-library');
+
+const clientId = process.env.GOOGLE_CLIENT_ID;
+const client = new OAuth2Client(clientId);
 
 router.post('/register', async (req, res) => {
     try {
@@ -23,7 +28,10 @@ router.post('/register', async (req, res) => {
   
       const savedUser = await newUser.save();
   
-      res.json(savedUser);
+      const secretKey = process.env.JWT_SECRET;
+      const token = jwt.sign({ userId: savedUser._id }, secretKey, { expiresIn: '10h' });
+
+      res.json({ token, user: {username: savedUser.username, email: savedUser.email} });
     } catch (error) {
       res.status(500).json({ error: 'Failed to register a new user.' });
     }
@@ -31,9 +39,9 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { username, password } = req.body;
   
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ username });
       if (!user) {
         return res.status(401).json({ message: 'Invalid credentials.' });
       }
@@ -45,10 +53,64 @@ router.post('/login', async (req, res) => {
   
       const secretKey = process.env.JWT_SECRET;
       const token = jwt.sign({ userId: user._id }, secretKey, {expiresIn: '10h'});
-      res.json({ token });
+      res.json({ token, user: {username: user.username, email: user.email} });
     } catch (error) {
       res.status(500).json({ error: 'Failed to log in.' });
     }
+});
+
+router.get('/user', authenticateUser, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    res.json({ username: user.username, email: user.email });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get user information.' });
+  }
+});
+
+router.post('/google-signup', async (req, res) => {
+  try {
+
+    const { googleToken } = req.body;
+
+    const ticket = await client.verifyIdToken({
+      idToken: googleToken,
+      audience: clientId,
+    });
+    const payload = ticket.getPayload();
+
+    console.log(payload);
+    const { name, email, sub: googleId } = payload;
+
+    let user = await User.findOne({ googleId });
+
+    if (!user) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user = new User({
+        username: name,
+        email,
+        googleId,
+        password: hashedPassword,
+        isGoogleSignUp: true,
+      });
+
+      await user.save();
+    }
+
+    const secretKey = process.env.JWT_SECRET;
+    const appToken = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '10h' });
+
+    res.json({ token: appToken, user: { username: user.username, email: user.email } });
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: "Failed to signup with google"});
+  }
 });
   
 module.exports = router;
