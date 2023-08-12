@@ -1,7 +1,8 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import GoogleLoginButton from "./GoogleLoginButton";
 
 
 function LoginForm() {
@@ -41,9 +42,16 @@ function LoginForm() {
         <div className="container">
             <div className="row justify-content-center">
                 <div className="col-md-4">   
+                    <Link to='/' style={{ textDecoration: 'none' }}>
+                        <h1 className="thrive-header">Thrive</h1>
+                    </Link>
+                    <h3 className="mt-4">Login</h3>
+                    <div className="google-login">
+                        <GoogleLoginButton />
+                    </div>
                     <div className="card mt-4">   
                         <div className="card-body">
-                            <h1 className="text-center mb-4">Login</h1>
+                            
                             {serverError && (
                             <Alert variant="danger" className="text-center">
                                 {serverError}
@@ -70,13 +78,16 @@ function LoginForm() {
                                     />
                                 </Form.Group>
 
-                                <Button variant="primary" type="submit" block className="mb-3">
+                                <Button variant="primary" type="submit" block className="mb-3 w-100">
                                     Login
                                 </Button>
                              </Form>
                         </div>  
                     </div>       
                 </div>
+                <div className="col-md-6 signup-image">
+                    <img src="/images/signup-image.jpg" alt="signup" />
+                </div>   
             </div>
         </div>
     );

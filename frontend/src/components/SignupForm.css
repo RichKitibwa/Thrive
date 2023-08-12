@@ -1,0 +1,28 @@
+.container { 
+    margin-top: 2rem;
+    min-height: 100vh; 
+}
+
+.signup-image img {
+    width: 70%;
+    height: auto;
+}
+.col-md-6.signup-image {
+    margin-top: 6rem;
+}
+
+.google-login {
+    margin-top: 2rem;
+}
+
+.card {
+     max-width: 400px; 
+}
+
+.card-body { 
+    padding: 2rem; 
+}
+
+.thrive-header {
+    color: black;
+}

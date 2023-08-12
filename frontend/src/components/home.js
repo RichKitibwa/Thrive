@@ -19,7 +19,7 @@ function Home() {
                 <div className="row">
                     <div className="col-md-6 text-center container-center">
                         <h1 className="lead-text">Manage all your tasks <br/> effectively and <br/> Thrive at life.</h1>
-                        <div className="text-center mt-4">
+                        <div className="text-center mt-4 mb-4">
                             <Link to={"/signup"}>
                                 <Button variant="primary" size="lg">
                                     Get Started
