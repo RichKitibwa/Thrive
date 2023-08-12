@@ -2,10 +2,11 @@ import React from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import zxcvbn from "zxcvbn";
-import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import jwt_decode from "jwt-decode";
+import "./SignupForm.css";
+import { Link } from "react-router-dom";
+import GoogleLoginButton from "./GoogleLoginButton";
 
 function SignupForm() {
 
@@ -70,42 +71,20 @@ function SignupForm() {
         setPasswordStrength(score);
     };
 
-    const onGoogleSuccess = async (response) => {
-        console.log(response);
-        const idToken = response.credential;
-        console.log('ID Token:', idToken);
-        try {
-            const backendResponse = await axios.post("/api/auth/google-signup", {
-                googleToken: idToken,
-            });
-
-            if(backendResponse.status !== 200) {
-                throw new Error(backendResponse.data.message || "Failed to signup with Google.");
-            }
-
-            const token = backendResponse.data.token;
-            localStorage.setItem("token", token);
-
-            console.log(backendResponse.data);
-            navigate("/dashboard");
-        } catch (error){
-            setServerError(error.message);
-        }
-    };
-
-    const onGoogleFailure = (response) => {
-        console.log(response.error);
-        alert(`Google sign-in failed: ${response.error}`);
-    };
-
     return (
 
         <div className="container">
             <div className="row justify-content-center">
                 <div className="col-md-4">
+                    <Link to='/' style={{ textDecoration: 'none' }}>
+                        <h1 className="thrive-header">Thrive</h1>
+                    </Link>                            
+                    <h3 className="mt-4">Sign Up</h3>
+                    <div className="google-login">
+                        <GoogleLoginButton />
+                    </div>
                     <div className="card mt-4">
                         <div className="card-body">
-                            <h1 className="text-center mb-4">Sign Up</h1>
                             {/* Display the server-side error */}
                             {serverError && (
                             <Alert variant="danger" className="text-center">
@@ -229,24 +208,16 @@ function SignupForm() {
                                     )}
                                 </Form.Group>
 
-                                <Button variant="primary" type="submit" block className="mb-3">
+                                <Button variant="primary" type="submit" block className="mb-3 md-4 w-100">
                                     Sign Up
                                 </Button>
                             </Form>
-                        </div>  
-                    </div>   
-                    {/* The sign in with Google button */}
-                    <div className="text-center">
-                        <GoogleLogin
-                            clientId="195441218187-i7r5ouroutjtbf6js7ks8sirjans9qfr.apps.googleusercontent.com"
-                            onSuccess={onGoogleSuccess}
-                            onFailure={onGoogleFailure}
-                            shape="pill"
-                            cookiePolicy={"single_host_origin"}
-                            className="mt-3"
-                        />
+                        </div> 
                     </div>
                 </div>
+                <div className="col-md-6 signup-image">
+                    <img src="/images/signup-image.jpg" alt="signup" />
+                </div>       
             </div>
         </div>
     );

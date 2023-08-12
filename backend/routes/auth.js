@@ -67,7 +67,7 @@ router.get('/user', authenticateUser, async (req, res) => {
       return res.status(404).json({ message: 'User not found.' });
     }
 
-    res.json({ username: user.username, email: user.email });
+    res.json({ username: user.username, email: user.email, imageUrl: user.imageUrl, isGoogleSignUp: user.isGoogleSignUp });
   } catch (error) {
     res.status(500).json({ error: 'Failed to get user information.' });
   }
@@ -85,18 +85,18 @@ router.post('/google-signup', async (req, res) => {
     const payload = ticket.getPayload();
 
     console.log(payload);
-    const { name, email, sub: googleId } = payload;
-
+    const { name, email, sub: googleId, picture } = payload;
     let user = await User.findOne({ googleId });
-
+    
     if (!user) {
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = googleToken
       user = new User({
         username: name,
         email,
         googleId,
         password: hashedPassword,
         isGoogleSignUp: true,
+        imageUrl: picture,
       });
 
       await user.save();
@@ -105,7 +105,7 @@ router.post('/google-signup', async (req, res) => {
     const secretKey = process.env.JWT_SECRET;
     const appToken = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '10h' });
 
-    res.json({ token: appToken, user: { username: user.username, email: user.email } });
+    res.json({ token: appToken, user: { username: user.username, email: user.email, imageUrl: user.imageUrl } });
 
   } catch (error) {
     console.log(error)

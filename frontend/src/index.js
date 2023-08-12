@@ -7,8 +7,10 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import axios from 'axios';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID
+
 root.render(
-  <GoogleOAuthProvider clientId='195441218187-i7r5ouroutjtbf6js7ks8sirjans9qfr.apps.googleusercontent.com'>
+  <GoogleOAuthProvider clientId={googleClientId}>
     <React.StrictMode>
       <App />
     </React.StrictMode>

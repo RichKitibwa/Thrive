@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import UserAvatar from "./UserAvatar";
+import { Navbar } from "react-bootstrap";
+import "./dashboardNav.css" 
 
 function TaskDashboard() {
   const [user, setUser] = useState(null);
@@ -34,11 +37,21 @@ function TaskDashboard() {
   }, []);
 
   return (
+    
     <div className="container">
-      <h1 className="text-center mt-5">Dashboard</h1>
-      {user && (
-        <p className="text-center mt-3">Welcome, {user.username}!</p>
-      )}
+      <Navbar fixed="top" className="dashboard-navbar">
+          <Navbar.Brand href="/" className="navbar-brand">
+              Thrive
+          </Navbar.Brand>
+          <div className="ml-auto">
+              <UserAvatar user={user} />
+          </div>
+      </Navbar>
+      {/* <div className="welcome-user">
+        {user && (
+          <p className="text-left ml-0">Welcome, {user.username}!</p>
+        )}
+        </div> */}
     </div>
   );
 }

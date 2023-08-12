@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: false },
   googleId: { type: String, required: false, unique: true },
   isGoogleSignUp: { type: Boolean, default: false },
+  imageUrl: { type: String, required: false },
   createdAt: { type: Date, default: Date.now },
 });
 
